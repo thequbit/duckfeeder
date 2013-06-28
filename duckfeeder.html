@@ -48,6 +48,16 @@
 
 		// images
 		var imgBackground = new Image;
+		var imgDuckLeft = new Image;
+		var imgDuckRight = new Image;
+		var imgDuckEatingLeft = new Image;
+		var imgDuckEatingRight = new Image;
+		var imgFeed0 = new Image;
+		var imgFeed1 = new Image;
+		var imgFeed2 = new Image;
+		var imgFeed3 = new Image;
+		var imgFeed4 = new Image;
+		var imgFeed5 = new Image;
 		
 		// sys vars
 		var fps = 30;
@@ -63,7 +73,19 @@
 			var c=document.getElementById("dfcanvas");
 			c.width = 640;
 			c.height = 480;
+			
+			// setup images
 			imgBackground.src = "background.png";
+			imgDuckLeft.src = "duckleft.png";
+			imgDuckRight.src = "duckright.png";
+			imgDuckEatingLeft.src = "duckeatingleft.png";
+			imgDuckEatingRight.src = "duckeatingright.png";
+			imgFeed0.src = "feed0.png";
+			imgFeed1.src = "feed1.png";
+			imgFeed2.src = "feed2.png";
+			imgFeed3.src = "feed3.png";
+			imgFeed4.src = "feed4.png";
+			imgFeed5.src = "feed5.png";
 			
 			// setup player
 			player.points = 0;
@@ -81,7 +103,7 @@
 			
 			// setup feed object
 			feed.img = new Image;
-			feed.img.src = "feed5.png";
+			feed.img = imgFeed5;
 			feed.x = 0;
 			feed.y = 0;
 			feed.amountmax = 5;
@@ -150,13 +172,13 @@
 					{
 						duck.x += 1;
 						duck.direction = 'right';
-						duck.img.src = "duckright.png";
+						duck.img = imgDuckRight;
 					}
 					else
 					{
 						duck.x -= 1;
 						duck.direction = 'left';
-						duck.img.src = "duckleft.png";
+						duck.img = imgDuckLeft;
 					}
 				}
 					
@@ -193,9 +215,9 @@
 					duck.y = feed.y;
 					duck.eating = true;
 					if( duck.direction = "left" )
-						duck.img.src = "duckeatingleft.png";
+						duck.img = imgDuckEatingLeft;
 					else
-						duck.img.src = "duckeatingright.png";
+						duck.img = imgDuckEatingRight;
 						
 					player.points++;
 				}

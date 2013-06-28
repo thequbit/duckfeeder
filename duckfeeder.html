@@ -1,0 +1,278 @@
+<html>
+<head>
+
+	<link href='http://fonts.googleapis.com/css?family=Freckle+Face' rel='stylesheet' type='text/css'>
+
+	<style>
+	
+		body {
+			font-family: 'Freckle Face', cursive;
+			background-image:url('tweed.png');
+			background-repeat:repeat-y repeat-x;
+		}
+	
+		div.contentwrapper {
+			margin: auto;
+			width: 800px;
+		}
+		
+		div.content {
+			text-align: center;
+			width: 800px;
+			background: #E0E0E0;
+		}
+		
+	</style>
+
+</head>
+<body>
+
+	<div class="contentwrapper">
+		<div class="content">
+
+			<br>
+			<h2>DUCK FEEDER!</h2>
+			<br>
+			"just feed the duck man"
+			<br>
+			<br>
+			<canvas id="dfcanvas" style="width: 640px; height: 480px;"></canvas>
+			<br>
+			<br>
+			
+		</div>
+	</div>
+
+	<script src="jquery-2.0.2.min.js"></script>
+	<script>
+
+		// images
+		var imgBackground = new Image;
+		
+		// sys vars
+		var fps = 30;
+
+		// sprite locations
+		var duck = {};
+		var feed = {};
+		var player = {};
+
+		function init()
+		{
+			// setup canvas
+			var c=document.getElementById("dfcanvas");
+			c.width = 640;
+			c.height = 480;
+			imgBackground.src = "background.png";
+			
+			// setup player
+			player.points = 0;
+			player.feedcount = 0;
+			player.feed = 10;
+			
+			// setup duck object
+			duck.img = new Image;
+			duck.img.src = "duck.png";
+			duck.x = 240;
+			duck.y = 300;
+			duck.newx = Math.floor( Math.random()*(640-64) );
+			duck.newy = Math.floor( Math.random()*(180-64) + 300 );
+			duck.eating = false;
+			
+			// setup feed object
+			feed.img = new Image;
+			feed.img.src = "feed5.png";
+			feed.x = 0;
+			feed.y = 0;
+			feed.amountmax = 5;
+			feed.amount = feed.amountmax;
+			feed.feeding = false;
+			
+			
+			// setup click event
+			$("#dfcanvas").click(function(e){
+				
+				var c=document.getElementById("dfcanvas");
+				
+				var x;
+				var y;
+				
+				// taken from http://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
+				if (e.pageX || e.pageY) { 
+					x = e.pageX;
+					y = e.pageY;
+				}
+				else { 
+					x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+					y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+				}
+				x -= c.offsetLeft;
+				y -= c.offsetTop;
+				
+				if( feed.feeding == false && y >= 300 )
+				{
+					feed.x = x;
+					feed.y = y;
+					feed.amount = feed.amountmax;
+					feed.feeding = true;
+					player.feedcount++;
+					player.feed--;
+				}
+				
+			 });
+		}
+	
+		function getctx()
+		{
+			var c=document.getElementById("dfcanvas");
+			ctx=c.getContext("2d");
+			return ctx;
+		}
+
+		function printscore()
+		{
+			// get the 2d context for drawing
+			var ctx = getctx();
+			
+			ctx.fillStyle = "blue";
+			ctx.font = "bold 16px Arial";
+			ctx.fillText("Feed Left: " + player.feed, 380, 20);
+			ctx.fillText("Score: " + player.points, 510, 20);
+		}
+
+		function moveduck()
+		{
+			if( duck.eating == false )
+			{
+				if( duck.x != duck.newx )
+				{
+					if( duck.x < duck.newx )
+					{
+						duck.x += 1;
+						duck.direction = 'right';
+						duck.img.src = "duckright.png";
+					}
+					else
+					{
+						duck.x -= 1;
+						duck.direction = 'left';
+						duck.img.src = "duckleft.png";
+					}
+				}
+					
+				if( duck.y != duck.newy )
+					if( duck.y < duck.newy )
+						duck.y += 1;
+					else
+						duck.y -= 1;
+					
+				if( duck.x == duck.newx && duck.y == duck.newy )
+				{
+					duck.newx = Math.floor( Math.random()*(640-64) );
+					duck.newy = Math.floor( Math.random()*(180-64) + 300 );
+				}
+			}
+		}
+
+		function checkcollision()
+		{
+		
+			if( feed.feeding == true && duck.eating == false )
+			{
+		
+				var dx = duck.x + 32;
+				var dy = duck.y + 32;
+				
+				var fx = feed.x + 32;
+				var fy = feed.y + 32;
+			
+				// perform distance to see if our duck is within 32 pixels of our feed.
+				if( Math.sqrt(Math.pow(dx - fx,2) + Math.pow(dy - fy,2)) <= 48 )
+				{
+					duck.x = feed.x;
+					duck.y = feed.y;
+					duck.eating = true;
+					if( duck.direction = "left" )
+						duck.img.src = "duckeatingleft.png";
+					else
+						duck.img.src = "duckeatingright.png";
+						
+					player.points++;
+				}
+				
+			}
+		}
+
+		function reducefeed()
+		{
+			if( feed.feeding == true )
+			{
+				if(feed.amount != 0)
+				{
+					feed.img.src = "feed" + feed.amount + ".png";
+					feed.amount--;
+				}
+				else
+				{
+					feed.amount = feed.amountmax;
+					feed.img.src = "feed" + feed.amountmax + ".png";
+					feed.feeding = false;
+					duck.eating = false;
+				}
+			}
+		}
+
+		function draw(cmd)
+		{
+			// clear the canvas
+			//var c=document.getElementById("dfcanvas");
+			//c.width = c.width;
+		
+			// get the 2d context for drawing
+			var ctx = getctx();
+		
+			// deturmine what to draw
+			switch(cmd)
+			{
+				case "background":
+					ctx.drawImage(imgBackground,0,0);
+					break;
+				case "duck":
+					ctx.drawImage(duck.img,duck.x,duck.y);
+					break;
+				case "feed":
+					if( feed.feeding == true )
+						ctx.drawImage(feed.img,feed.x,feed.y);
+					break;
+				default:
+					break;
+			}
+		}
+
+		function duckfeeder()
+		{
+			draw('background');
+			draw('feed');
+			draw('duck');
+			
+			printscore();
+		}
+
+		init();
+
+		// start the game loop at the specified fps
+		setInterval(duckfeeder, 1000 / fps);
+		
+		// move the duck every second
+		setInterval(moveduck,1000 / (fps*5));
+		
+		// reduce the amount of feed that is floating
+		setInterval(reducefeed,500);
+
+		// reduce the amount of feed that is floating
+		setInterval(checkcollision,250);
+
+	</script>
+
+</body>
+</html>

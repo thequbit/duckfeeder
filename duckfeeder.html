@@ -239,10 +239,22 @@
 					feed.amount = feed.amountmax;
 					feed.img.src = "feed" + feed.amountmax + ".png";
 					feed.feeding = false;
-					duck.eating = false;
+                    duck.eating = false;
+
+                    if (player.feed == 0){
+
+                        setTimeout(gameOver, 500);
+                        
+                    }
 				}
 			}
-		}
+        }
+
+        function gameOver() {
+
+            alert("Game Over!");
+
+        }
 
 		function draw(cmd)
 		{
